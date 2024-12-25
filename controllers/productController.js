@@ -74,7 +74,7 @@ exports.createProduct = catchAsyncErrors(async (req, res, next) => {
     images: productImages,
   });
 
-  myCache.del("all-products","categories");
+  // myCache.del("all-products","categories");
 
   res.status(201).json({
     success: true,
@@ -111,12 +111,14 @@ exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
 exports.getAllCategories = catchAsyncErrors(async (req, res, next) => {
   let categories;
 
-  if (myCache.has("categories")) {
-    categories = JSON.parse(myCache.get("categories"));
-  } else {
-    categories = await Product.distinct("category");
-    myCache.set("categories", JSON.stringify(categories));
-  }
+  categories = await Product.distinct("category");
+
+  //  if (myCache.has("categories")) {
+  //   categories = JSON.parse(myCache.get("categories"));
+  // } else {
+  //   categories = await Product.distinct("category");
+  //   myCache.set("categories", JSON.stringify(categories));
+  // }
 
   res.status(200).json({
     success: true,
@@ -128,12 +130,14 @@ exports.getAllCategories = catchAsyncErrors(async (req, res, next) => {
 exports.getAdminProducts = catchAsyncErrors(async (req, res, next) => {
   const productsCount = await Product.countDocuments();
   let products;
-  if (myCache.has("all-products")) {
-    products = JSON.parse(myCache.get("all-products"));
-  } else {
     products = await Product.find().sort({ createdAt: -1 });
-    myCache.set("all-products", JSON.stringify(products));
-  }
+
+  // if (myCache.has("all-products")) {
+  //   products = JSON.parse(myCache.get("all-products"));
+  // } else {
+  //   products = await Product.find().sort({ createdAt: -1 });
+  //   myCache.set("all-products", JSON.stringify(products));
+  // }
 
   return res.status(200).json({
     success: true,
@@ -197,7 +201,7 @@ exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
     // Update product with new images
     product.images = updatedImages;
     await product.save();
-    myCache.del("all-products","categories");
+    // myCache.del("all-products","categories");
   }
 
   res.status(200).json({
@@ -232,7 +236,7 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
 
   // Remove the product itself
   await product.remove();
-  myCache.del("all-products","categories");
+  // myCache.del("all-products","categories");
 
   res.status(200).json({
     success: true,
